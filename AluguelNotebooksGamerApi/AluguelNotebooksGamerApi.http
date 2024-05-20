@@ -1,0 +1,6 @@
+@AluguelNotebooksGamerApi_HostAddress = http://localhost:5047
+
+GET {{AluguelNotebooksGamerApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
