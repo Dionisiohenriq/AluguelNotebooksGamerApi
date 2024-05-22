@@ -20,7 +20,7 @@ namespace AluguelNotebooksGamerApi.Entities
         public void Configure(EntityTypeBuilder<BaseClass> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).IsRequired().UseIdentityColumn();
+            builder.Property(x => x.Id).IsRequired();
         }
     }
 }

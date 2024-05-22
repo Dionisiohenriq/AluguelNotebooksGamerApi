@@ -25,7 +25,9 @@ namespace AluguelNotebooksGamerApi.Data
             modelBuilder.ApplyConfiguration(new Client());
             modelBuilder.ApplyConfiguration(new Address());
             modelBuilder.ApplyConfiguration(new Brand());
-
+            modelBuilder.ApplyConfiguration(new Model());
+            modelBuilder.ApplyConfiguration(new Rented());
+            modelBuilder.ApplyConfiguration(new ModelConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
