@@ -11,7 +11,6 @@ namespace AluguelNotebooksGamerApi.Data
         {
 
         }
-        public DbSet<BaseClass> BaseClasses { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Brand> Brands { get; set; }
@@ -21,7 +20,6 @@ namespace AluguelNotebooksGamerApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new BaseClass());
             modelBuilder.ApplyConfiguration(new Client());
             modelBuilder.ApplyConfiguration(new Address());
             modelBuilder.ApplyConfiguration(new Brand());

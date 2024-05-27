@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AluguelNotebooksGamerApi.Entities
 {
-    public class Client : BaseClass
+    public class Client : BaseClass, IEntityTypeConfiguration<Client>
     {
         public Client() : base() { }
         public Client(string firstName, int age, string? document, string? contact, string? email, Address address, string? lastName) : this()
@@ -27,7 +27,8 @@ namespace AluguelNotebooksGamerApi.Entities
 
         public void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.HasBaseType(typeof(BaseClass));
+            builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).IsRequired();
         }
     }
 }

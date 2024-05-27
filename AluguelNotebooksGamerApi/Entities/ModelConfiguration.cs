@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AluguelNotebooksGamerApi.Entities
 {
-    public class ModelConfiguration : BaseClass
+    public class ModelConfiguration : BaseClass, IEntityTypeConfiguration<ModelConfiguration>
     {
         public ModelConfiguration() : base() { }
 
@@ -27,7 +28,8 @@ namespace AluguelNotebooksGamerApi.Entities
 
         public void Configure(EntityTypeBuilder<ModelConfiguration> builder)
         {
-            builder.HasBaseType(typeof(BaseClass));
+            builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).IsRequired();
         }
     }
 }

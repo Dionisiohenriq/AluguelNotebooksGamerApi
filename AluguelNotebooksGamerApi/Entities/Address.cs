@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AluguelNotebooksGamerApi.Entities
 {
-    public class Address : BaseClass
+    public class Address : BaseClass, IEntityTypeConfiguration<Address>
     {
         public Address() : base() { }
         public Address(int number, string? street, string? neighborhood, string? city, string? country) : this()
@@ -23,7 +23,8 @@ namespace AluguelNotebooksGamerApi.Entities
 
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-            builder.HasBaseType(typeof(Address));
+            builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).IsRequired();
         }
     }
 }

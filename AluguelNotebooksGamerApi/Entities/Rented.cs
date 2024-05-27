@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AluguelNotebooksGamerApi.Entities
 {
-    public class Rented : BaseClass
+    public class Rented : BaseClass, IEntityTypeConfiguration<Rented>
     {
         public DateTime Period { get; private set; }
         public Decimal ValuePerHour { get; private set; }
@@ -23,7 +24,8 @@ namespace AluguelNotebooksGamerApi.Entities
 
         public void Configure(EntityTypeBuilder<Rented> builder)
         {
-            builder.HasBaseType(typeof(BaseClass));
+            builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).IsRequired();
         }
     }
 }

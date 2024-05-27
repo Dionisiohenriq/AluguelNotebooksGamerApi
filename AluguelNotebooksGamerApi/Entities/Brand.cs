@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AluguelNotebooksGamerApi.Entities
 {
-    public class Brand : BaseClass
+    public class Brand : BaseClass, IEntityTypeConfiguration<Brand>
     {
         public Brand() : base() { }
         public Brand(string? name, string? country, List<Model>? models) : this()
@@ -19,7 +19,8 @@ namespace AluguelNotebooksGamerApi.Entities
 
         public void Configure(EntityTypeBuilder<Brand> builder)
         {
-            builder.HasBaseType(typeof(BaseClass));
+            builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).IsRequired();
         }
     }
 }
