@@ -27,7 +27,7 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
             _configuration = configuration;
         }
 
-        [HttpPost]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
@@ -52,9 +52,8 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
             return BadRequest();
         }
 
-        [HttpPost]
+        [HttpPost("Login")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
@@ -80,6 +79,19 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
 
             if (result.RequiresTwoFactor)
             {
+            }
+
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            if (ModelState.IsValid)
+            {
+                var usersList = _userManager.Users.ToList();
+                return Ok(usersList);
             }
 
             return BadRequest();
