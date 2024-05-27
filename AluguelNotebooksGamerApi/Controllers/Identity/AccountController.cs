@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,17 +15,23 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
+        public AccountController(UserManager<IdentityUser> userManager,
+                                SignInManager<IdentityUser> signInManager,
+                                IConfiguration configuration,
+                                RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         [HttpPost("Register")]
@@ -85,12 +92,13 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "RequireUserAdminGerenteRole")]
         public async Task<IActionResult> GetAllUsers()
         {
             if (ModelState.IsValid)
             {
-                var usersList = _userManager.Users.ToList();
+                var usersList = _userManager.Users;
+
                 return Ok(usersList);
             }
 
@@ -100,7 +108,7 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
         private async Task<string> GenerateJWTToken(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
