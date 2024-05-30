@@ -1,12 +1,9 @@
 ﻿using AluguelNotebooksGamerApi.Entities.Identity;
 using AluguelNotebooksGamerApi.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,24 +13,11 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class AccountController : ControllerBase
+    public class AccountController(UserManager<IdentityUser> userManager,
+                            SignInManager<IdentityUser> signInManager,
+                            IConfiguration configuration,
+                            RoleManager<IdentityRole> roleManager) : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly RoleManager<IdentityRole> _roleManager;
-
-        public AccountController(UserManager<IdentityUser> userManager,
-                                SignInManager<IdentityUser> signInManager,
-                                IConfiguration configuration,
-                                RoleManager<IdentityRole> roleManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-            _roleManager = roleManager;
-        }
-
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterModel model)
         {
@@ -45,12 +29,12 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
                     Password = model.Password,
                 };
 
-                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await userManager.AddToRoleAsync(user, "User");
+                    await signInManager.SignInAsync(user, isPersistent: false);
 
                     return Ok();
                 }
@@ -68,18 +52,18 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
                 return BadRequest(ModelState);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, true);
+            var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, true);
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var user = await userManager.FindByEmailAsync(model.Email);
 
                 if (user is null)
                 {
                     return NotFound();
                 }
 
-                var token = await GenerateJWTToken(user);
+                var token = GenerateJWTToken(user);
 
                 return Ok(new { token = token, user = user });
             }
@@ -93,11 +77,11 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
 
         [HttpGet]
         [Authorize(Policy = "RequireUserAdminGerenteRole")]
-        public async Task<IActionResult> GetAllUsers()
+        public IActionResult GetAllUsers()
         {
             if (ModelState.IsValid)
             {
-                var usersList = _userManager.Users;
+                var usersList = userManager.Users;
 
                 return Ok(usersList);
             }
@@ -105,10 +89,10 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
             return BadRequest();
         }
 
-        private async Task<string> GenerateJWTToken(IdentityUser user)
+        private string GenerateJWTToken(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -116,8 +100,8 @@ namespace AluguelNotebooksGamerApi.Controllers.Identity
                 {
                     new Claim("/email", user.Email),
                 }),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:ValidOn"],
+                Issuer = configuration["Jwt:Issuer"],
+                Audience = configuration["Jwt:ValidOn"],
                 Expires = DateTime.Now.AddHours(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
