@@ -3,8 +3,6 @@ using MediatR;
 
 namespace AluguelNotebooksGamerApi.CQRS.Commands
 {
-    public record AddModelCommand(Model Model) : IRequest<Model>;
-
+    public record UpdateModelCommand(Model Model) : IRequest<Model>;
 
 }
-

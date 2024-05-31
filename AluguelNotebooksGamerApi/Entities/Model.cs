@@ -21,6 +21,10 @@ namespace AluguelNotebooksGamerApi.Entities
         public Brand? Brand { get; private set; }
         public ModelConfiguration? ModelConfiguration { get; private set; }
 
+        public async Task EventOcurred(Model model, string evt)
+        {
+
+        }
         public void Configure(EntityTypeBuilder<Model> builder)
         {
             builder.HasKey(i => i.Id);

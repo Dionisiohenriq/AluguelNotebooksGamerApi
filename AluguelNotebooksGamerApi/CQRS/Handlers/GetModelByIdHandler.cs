@@ -17,7 +17,12 @@ namespace AluguelNotebooksGamerApi.CQRS.Handlers
 
         public async Task<Model> Handle(GetModelByIdQuery request, CancellationToken cancellationToken)
         {
-            await _context.
+            var result = await _context.FindAsync<Model>(request.Id).ConfigureAwait(false);
+
+            if (result is not null)
+                return result;
+
+            return null;
         }
     }
 }

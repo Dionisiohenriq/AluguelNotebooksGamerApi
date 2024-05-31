@@ -1,4 +1,5 @@
 ﻿using AluguelNotebooksGamerApi.CQRS.Commands;
+using AluguelNotebooksGamerApi.CQRS.Notifications;
 using AluguelNotebooksGamerApi.CQRS.Queries;
 using AluguelNotebooksGamerApi.Entities;
 using MediatR;
@@ -17,12 +18,29 @@ namespace AluguelNotebooksGamerApi.Controllers
             return Ok(models);
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public async Task<IActionResult> AddModel([FromBody] Model model)
         {
-            await mediator.Send(new AddModelCommand(model));
+            var modelResult = await mediator.Send(new AddModelCommand(model));
 
-            return StatusCode(201);
+            await mediator.Publish(new ModelAddedNotification(modelResult));
+
+            return CreatedAtRoute("GetModelById", new { id = modelResult.Id }, modelResult);
+        }
+
+        [HttpGet("{id:int}", Name = "GetModelById")]
+        public async Task<IActionResult> GetModelById(int id)
+        {
+            var model = await mediator.Send(new GetModelByIdQuery(id));
+            return Ok(model);
+        }
+
+        [HttpPost("Update")]
+        public async Task<IActionResult> UpdateModel(Model model)
+        {
+            var modelResult = await mediator.Send(new UpdateModelCommand(model));
+
+            return CreatedAtRoute("GetModelById", new { id = modelResult.Id }, modelResult);
         }
     }
 }
